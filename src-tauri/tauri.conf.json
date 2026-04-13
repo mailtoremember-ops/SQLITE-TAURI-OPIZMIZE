@@ -11,21 +11,11 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "dialog": {
-        "all": true
-      },
-      "protocol": {
-        "asset": true
-      }
+      "all": true
     },
     "bundle": {
       "active": true,
-      "targets": ["msi", "nsis"],
+      "targets": ["msi"],
       "identifier": "com.gmach.tools",
       "icon": ["icon.ico"]
     },
@@ -34,6 +24,8 @@
     },
     "windows": [
       {
+        "label": "main",
+        "visible": false,
         "fullscreen": false,
         "height": 700,
         "resizable": true,
