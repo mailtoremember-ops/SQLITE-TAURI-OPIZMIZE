@@ -1,9 +1,11 @@
-name: Build Windows App
+name: Build & Release App
 on:
   workflow_dispatch: 
 
 jobs:
   build:
+    permissions:
+      contents: write
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -17,16 +19,19 @@ jobs:
         with:
           workspaces: src-tauri
 
-      - name: Install Tauri CLI
-        run: cargo install tauri-cli --version "^1"
-
       - name: Build App
-        run: |
-          cd src-tauri
-          cargo tauri build
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "Gmach Tools v__VERSION__"
+          releaseBody: "גרסה יציבה ואופטימלית של גמ\"ח כלי עבודה."
+          releaseDraft: false
+          prerelease: false
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Gmach-Tools-Exe
-          path: src-tauri/target/release/*.exe
+          name: Gmach-Tools-Installers
+          path: src-tauri/target/release/bundle/msi/*.msi
