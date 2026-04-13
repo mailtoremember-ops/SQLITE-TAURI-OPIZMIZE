@@ -47,5 +47,8 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Gmach-Tools-Exe
-          path: src-tauri/target/release/*.exe
+          name: Gmach-Tools-Files
+          # כאן אנחנו אומרים לו לקחת גם EXE וגם MSI
+          path: |
+            src-tauri/target/release/*.exe
+            src-tauri/target/release/bundle/msi/*.msi
