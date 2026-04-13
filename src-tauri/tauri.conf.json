@@ -11,10 +11,21 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "dialog": {
+        "all": true
+      },
+      "protocol": {
+        "asset": true
+      }
     },
     "bundle": {
-      "active": false,
+      "active": true,
+      "targets": ["msi", "nsis"],
       "identifier": "com.gmach.tools",
       "icon": ["icon.ico"]
     },
