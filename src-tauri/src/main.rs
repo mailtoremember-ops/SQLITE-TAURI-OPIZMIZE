@@ -16,7 +16,7 @@ fn main() {
       let w = window.clone();
       std::thread::spawn(move || {
         // השהייה קצרה שנותנת ל-Windows זמן למקם את החלון במיקומו הישן לפני החשיפה
-        std::thread::sleep(std::time::Duration::from_millis(110));
+        std::thread::sleep(std::time::Duration::from_millis(120));
         w.show().unwrap();
         w.set_focus().unwrap();
       });
