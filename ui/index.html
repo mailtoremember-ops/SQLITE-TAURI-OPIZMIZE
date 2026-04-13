@@ -261,10 +261,21 @@
                 "CREATE TABLE IF NOT EXISTS wishlist (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, count INTEGER)"
             ];
             for (let q of queries) await tauriInvoke("plugin:sql|execute", { db: DB_NAME, query: q, values: [] });
+            
             const lastBackup = localStorage.getItem('gmach_last_backup');
             if (lastBackup) document.getElementById('lastBackupDisplay').innerText = `גיבוי אחרון בוצע ב: ${lastBackup}`;
-            refreshAll();
-        } catch (e) { console.error("DB Init Error:", e); }
+            
+            // 1. רינדור ראשוני של כל הטבלאות
+            await refreshAll();
+            
+            // 2. דיווח ל-Rust שהכל מוכן - החלון יוצג עכשיו!
+            await tauriInvoke("show_main_window");
+            
+        } catch (e) { 
+            console.error("DB Init Error:", e);
+            // גם במקרה של שגיאה, ננסה להציג את החלון כדי שהמשתמש לא יתקע
+            await tauriInvoke("show_main_window");
+        }
     }
 
     const DB = {
