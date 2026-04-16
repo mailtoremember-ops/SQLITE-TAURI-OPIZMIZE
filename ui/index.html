@@ -431,11 +431,43 @@
     }
 
     async function saveTool() {
-        await saveForUndo(); const id = document.getElementById("tmId").value;
-        const tool = { name: document.getElementById("tmName").value, desc: document.getElementById("tmDesc").value, serial: document.getElementById("tmSerial").value, status: "זמין", borrower: "", borrowCount: parseInt(document.getElementById("tmCount").value)||0 };
-        if (id) { tool.id = parseInt(id); const old = await DB.get("tools", tool.id); tool.status = old.status; tool.borrower = old.borrower; tool.borrowDate = old.borrowDate; }
-        await DB.put("tools", tool); closeM('toolModal'); showToast("נשמר בהצלחה"); refreshAll();
+    const nameInput = document.getElementById("tmName").value.trim();
+    
+    // 1. ולידציה (אימות נתונים) - הדרך המקצועית
+    if (!nameInput) {
+        showToast("שגיאה: חובה להזין את שם הכלי");
+        return; // עוצרים את הפונקציה ולא שומרים
     }
+
+    await saveForUndo(); 
+    const id = document.getElementById("tmId").value;
+    
+    const tool = { 
+        name: nameInput, 
+        desc: document.getElementById("tmDesc").value.trim(), 
+        serial: document.getElementById("tmSerial").value.trim(), 
+        status: "זמין", 
+        borrower: "", 
+        borrowCount: parseInt(document.getElementById("tmCount").value) || 0 
+    };
+    
+    // 2. ניתוב לוגי (Upsert)
+    if (id) { 
+        tool.id = parseInt(id); 
+        const old = await DB.get("tools", tool.id); 
+        // שומרים על נתונים קיימים שלא אמורים להשתנות בעריכה רגילה
+        tool.status = old.status; 
+        tool.borrower = old.borrower; 
+        tool.borrowDate = old.borrowDate; 
+        await DB.put("tools", tool);
+    } else {
+        await DB.add("tools", tool);
+    }
+    
+    closeM('toolModal'); 
+    showToast("הכלי נשמר בהצלחה"); 
+    refreshAll();
+}
 
     async function renderManageBorrowers() {
         const q = document.getElementById("mBorrSearch").value.toLowerCase();
@@ -451,10 +483,35 @@
     }
 
     async function saveBorrower() {
-        await saveForUndo(); const id = document.getElementById("bmId").value;
-        const b = { name: document.getElementById("bmName").value, phone: document.getElementById("bmPhone").value, address: document.getElementById("bmAddress").value };
-        if (id) b.id = parseInt(id); await DB.put("borrowers", b); closeM('borrowerModal'); showToast("נשמר בהצלחה"); refreshAll();
+    const nameInput = document.getElementById("bmName").value.trim();
+    
+    // 1. ולידציה
+    if (!nameInput) {
+        showToast("שגיאה: חובה להזין את שם השואל");
+        return;
     }
+
+    await saveForUndo(); 
+    const id = document.getElementById("bmId").value;
+    
+    const b = { 
+        name: nameInput, 
+        phone: document.getElementById("bmPhone").value.trim(), 
+        address: document.getElementById("bmAddress").value.trim() 
+    };
+    
+    // 2. ניתוב לוגי (Upsert)
+    if (id) { 
+        b.id = parseInt(id); 
+        await DB.put("borrowers", b); 
+    } else {
+        await DB.add("borrowers", b);
+    }
+    
+    closeM('borrowerModal'); 
+    showToast("השואל נשמר בהצלחה"); 
+    refreshAll();
+}
 
     async function delItem(store, id) {
         if (store === 'tools') { const t = await DB.get('tools', id); if (t?.status==='מושאל') { await myAlert("פעולה נחסמה", `לא ניתן למחוק את <b>${t.name}</b> כשהוא מושאל!`); return; } }
